@@ -1,0 +1,100 @@
+peripherals:
+  - name: i2c_audio
+    type: i2c
+    role: master
+    config:
+      port: 0
+      pins:
+        sda: 28
+        scl: 25
+
+  # ESP32-P4 has only two HP I2C ports, the camera uses LP I2C.
+  - name: i2c_camera
+    type: i2c
+    role: master
+    config:
+      port: LP_I2C_NUM_0
+      clk_source: LP_I2C_SCLK_DEFAULT
+      pins:
+        sda: 9
+        scl: 10
+
+  - name: i2c_touch
+    type: i2c
+    role: master
+    config:
+      port: 1
+      pins:
+        sda: 49
+        scl: 48
+
+  - name: i2s_audio_out
+    type: i2s
+    format: tdm-out
+    role: master
+    config: &i2s_config
+      port: 0
+      sample_rate_hz: 48000
+      clk_src: "I2S_CLK_SRC_DEFAULT"
+      mclk_multiple: 256
+      data_bit_width: 16
+      slot_mode: I2S_SLOT_MODE_STEREO
+      ws_width: 16
+      total_slot: 2
+      slot_mask: I2S_TDM_SLOT0
+      pins:
+        mclk: 26
+        bclk: 27
+        ws: 30
+        dout: 31
+        din: 29
+
+  - name: i2s_audio_in
+    type: i2s
+    format: tdm-in
+    role: master
+    config:
+      <<: *i2s_config
+      total_slot: 2
+      slot_mask: I2S_TDM_SLOT0 | I2S_TDM_SLOT1
+
+  - name: gpio_boot_button
+    type: gpio
+    role: io
+    config:
+      pin: 35
+      mode: GPIO_MODE_INPUT
+      pull_up: true
+      pull_down: false
+
+  - name: gpio_backlight
+    type: gpio
+    role: io
+    config:
+      pin: 24
+      mode: GPIO_MODE_OUTPUT
+      default_level: 0
+
+  - name: gpio_sd_power
+    type: gpio
+    role: io
+    config:
+      pin: 4
+      mode: GPIO_MODE_OUTPUT
+      default_level: 1
+
+  - name: ldo_mipi
+    type: ldo
+    config:
+      chan_id: 3
+      voltage_mv: 2500
+      adjustable: 1
+      owned_by_hw: 0
+
+  - name: dsi_display
+    type: dsi
+    config:
+      bus_id: 0
+      data_lanes: 2
+      phy_clk_src: 0
+      lane_bit_rate_mbps: 440

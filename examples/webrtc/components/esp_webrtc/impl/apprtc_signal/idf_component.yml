@@ -1,0 +1,12 @@
+dependencies:
+  espressif/media_lib_sal:
+    version: "*"
+  espressif/esp_peer:
+    version: "~1.5.7"
+  espressif/cjson:
+    version: "~1.7"
+
+  # local component
+  esp_webrtc:
+    path: ../..
+    version: "*"

@@ -1,0 +1,9 @@
+dependencies:
+  esp_webrtc:
+    path: ../..
+    version: "*"
+  espressif/esp_peer:
+    version: "~1.5.7"
+    public: true
+  espressif/cjson:
+    version: "~1.7"

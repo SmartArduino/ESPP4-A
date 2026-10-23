@@ -1,0 +1,5 @@
+description: ESPP4-A board definitions for ESP Board Manager
+version: 1.0.0
+tags:
+  - board_manager
+  - esp_board_manager

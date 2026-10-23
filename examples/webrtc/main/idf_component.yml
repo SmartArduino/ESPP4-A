@@ -1,0 +1,10 @@
+dependencies:
+  idf:
+    version: ">=5.5"
+  espressif/esp_board_manager: "~0.7.4"
+  espressif/esp_h264: "~1.4"
+  espressif/esp_peer: "~1.5.7"
+  tempotian/av_render: "~1.2"
+  tempotian/media_lib_utils: "~0.9"
+  espp4_a_boards:
+    path: ../../../components/espp4_a_boards

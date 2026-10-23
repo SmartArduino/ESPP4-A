@@ -1,0 +1,162 @@
+devices:
+  - name: sdcard_power_ctrl
+    type: power_ctrl
+    sub_type: gpio
+    peripherals:
+      - gpio_name: gpio_sd_power
+        active_level: 0
+
+  - name: fs_sdcard
+    type: fs_fat
+    sub_type: sdmmc
+    power_ctrl_device: sdcard_power_ctrl
+    init_skip: true
+    config:
+      mount_point: /sdcard
+      vfs_config:
+        format_if_mount_failed: false
+        max_files: 2
+        allocation_unit_size: 16384
+      sub_config:
+        slot: SDMMC_HOST_SLOT_0
+        frequency: SDMMC_FREQ_DEFAULT
+        bus_width: 4
+        slot_flags: SDMMC_SLOT_FLAG_INTERNAL_PULLUP
+        ldo_chan_id: -1      # Do not power the card from LDO4.
+        pins:
+          clk: 43
+          cmd: 44
+          d0: 39
+          d1: 40
+          d2: 41
+          d3: 42
+          cd: 45
+
+  - name: audio_dac
+    chip: es8311
+    type: audio_codec
+    config:
+      dac_enabled: true
+      sys_cfg:
+        no_mclk: true
+      dac_cfg:
+        ref_enable: true
+    peripherals:
+      - i2s_name: i2s_audio_out
+      - i2c_name: i2c_audio
+        address: 0x30
+        frequency: 400000
+
+  - name: audio_adc
+    chip: es8311
+    type: audio_codec
+    config:
+      adc_enabled: true
+      sys_cfg:
+        no_mclk: true
+      adc_cfg:
+        label: [FC, RE]
+    peripherals:
+      - i2s_name: i2s_audio_in
+      - i2c_name: i2c_audio
+        address: 0x30
+        frequency: 400000
+
+  - name: boot_button
+    type: button
+    sub_type: gpio
+    version: default
+    config:
+      active_level: 0
+      enable_power_save: false
+      disable_pull: false
+      long_press_time: 2000
+      short_press_time: 100
+    peripherals:
+      - gpio_name: gpio_boot_button
+
+  - name: display_lcd
+    chip: st7102
+    type: display_lcd
+    sub_type: dsi
+    config:
+      # Reset by GPIO in setup_device.c, DPI panels do not support esp_lcd_panel_reset
+      need_reset: false
+      reset_gpio_num: -1
+      rgb_ele_order: LCD_RGB_ELEMENT_ORDER_RGB
+      bits_per_pixel: 16
+      reset_active_high: 0
+      dbi_config:
+        virtual_channel: 0
+        lcd_cmd_bits: 8
+        lcd_param_bits: 8
+      dpi_config:
+        virtual_channel: 0
+        dpi_clk_src: MIPI_DSI_DPI_CLK_SRC_DEFAULT
+        dpi_clock_freq_mhz: 36
+        pixel_format: LCD_COLOR_PIXEL_FORMAT_RGB565
+        in_color_format: LCD_COLOR_FMT_RGB565
+        out_color_format: LCD_COLOR_FMT_RGB565
+        num_fbs: 1
+        flags:
+          use_dma2d: true
+          disable_lp: false
+        video_timing:
+          h_size: 480
+          v_size: 854
+          hsync_pulse_width: 5
+          hsync_back_porch: 20
+          hsync_front_porch: 60
+          vsync_pulse_width: 5
+          vsync_back_porch: 6
+          vsync_front_porch: 195
+    peripherals:
+    - ldo_name: ldo_mipi
+    - dsi_name: dsi_display
+
+  # ST7102 touch is compatible with the ST7123 protocol.
+  - name: lcd_touch
+    chip: st7123
+    type: lcd_touch
+    sub_type: i2c
+    version: default
+    dependencies:
+      espressif/esp_lcd_touch_st7123: "^1.0.2"
+    config:
+      io_i2c_config:
+        control_phase_bytes: 1
+        lcd_cmd_bits: 16
+        scl_speed_hz: 100000
+        flags:
+          disable_control_phase: true
+      touch_config:
+        x_max: 480
+        y_max: 854
+    peripherals:
+      - i2c_name: i2c_touch
+        i2c_addr: [0xAA]
+
+  - name: lcd_brightness
+    type: gpio_ctrl
+    config:
+      active_level: 1
+      default_level: 0
+    peripherals:
+      - gpio_name: gpio_backlight
+
+  - name: camera
+    type: camera
+    version: default
+    sub_type: "csi"
+    config:
+      csi_config:
+        reset_io: 11
+        pwdn_io: -1
+        dont_init_ldo: true
+        xclk_config:
+          xclk_pin: 21
+          xclk_freq_hz: 24000000
+    peripherals:
+      - i2c_name: i2c_camera
+        frequency: 100000
+      - ldo_name: ldo_mipi
