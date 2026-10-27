@@ -625,6 +625,7 @@ void app_main(void)
         ESP_LOGE(TAG, "WiFi init failed (%s)", esp_err_to_name(err));
         return;
     }
+    ESP_LOGI(TAG, "WiFi init success (ESP_OK)");
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
 
